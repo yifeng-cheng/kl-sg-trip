@@ -1,14 +1,18 @@
-const CACHE = 'kl-sg-trip-v6';
+const CACHE = 'kl-sg-trip-v7';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './version.json'
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
+  event.waitUntil(caches.open(CACHE).then(cache => Promise.all(ASSETS.map(async asset => {
+    const response = await fetch(new Request(asset, { cache: 'reload' }));
+    await cache.put(asset, response);
+  }))));
   self.skipWaiting();
 });
 
@@ -25,7 +29,7 @@ self.addEventListener('fetch', event => {
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
+      fetch(new Request(event.request, { cache: 'no-store' }))
         .then(response => {
           const copy = response.clone();
           caches.open(CACHE).then(cache => cache.put('./index.html', copy));
