@@ -1,4 +1,4 @@
-const CACHE = 'kl-sg-trip-v4';
+const CACHE = 'kl-sg-trip-v5';
 const ASSETS = [
   './',
   './index.html',
